@@ -7,10 +7,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movie_project_app/config.dart';
-import 'package:movie_project_app/movie_rank.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MyApp1());
 }
 
 class Photo {
@@ -50,8 +49,8 @@ List<Photo> parsePhotos(Uint8List responseBody) {
   return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp1 extends StatelessWidget {
+  const MyApp1({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +74,7 @@ class _MyWidgetState extends State<MyWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('상영중인 영화'),
+        title: Text('영끌'),
         centerTitle: true,
         elevation: 0.0,
         backgroundColor: Colors.cyan,
@@ -98,19 +97,9 @@ class _MyWidgetState extends State<MyWidget> {
       ),
       drawer: Drawer(
           child: ListView(
-            // padding: EdgeInsets.zero,
+            padding: EdgeInsets.zero,
             children: <Widget>[
             new Container(
-              child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10.0, 12.5, 0.0, 0.0),
-                  child: Text(
-                    "영끌",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15
-                    ),
-                  ),
-              ),
               height: 50.0,
               color: Colors.cyan,
               ),
@@ -118,7 +107,6 @@ class _MyWidgetState extends State<MyWidget> {
             leading: Icon(Icons.movie),
             title: const Text('영화 예매하기'),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp1()));
             },
           ),
           ListTile(
