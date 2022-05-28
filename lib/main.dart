@@ -13,17 +13,17 @@ void main() {
   runApp(MyApp());
 }
 
-class Photo {
+class Movie {
   final String? grade;
   final String? movie_name;
   final String? movie_time;
   final String? thumbnailUrl ;
 
-  Photo({this.grade, this.movie_name, this.movie_time, this.thumbnailUrl});
+  Movie({this.grade, this.movie_name, this.movie_time, this.thumbnailUrl});
 
   // 사진의 정보를 포함하는 인스턴스를 생성하여 반환하는 factory 생성자
-  factory Photo.fromJson(Map<String, dynamic> json) {
-    return Photo(
+  factory Movie.fromJson(Map<String, dynamic> json) {
+    return Movie(
       grade: json['grade'] as String,
       movie_name: json['movie_name'] as String,
       movie_time: json['movie_time'] as String,
@@ -32,22 +32,22 @@ class Photo {
   }
 }
 
-Future<List<Photo>> fetchPhotos(http.Client client) async {
+Future<List<Movie>> fetchPhotos(http.Client client) async {
   // 해당 URL로 데이터를 요청하고 수신함
   Config con = new Config();
   final response =
-      await client.get(Uri.parse(con.file1));
+      await client.get(Uri.parse(con.list));
 
   // parsePhotos 함수를 백그라운도 격리 처리
   return compute(parsePhotos, response.bodyBytes);
 }
 
-List<Photo> parsePhotos(Uint8List responseBody) {
+List<Movie> parsePhotos(Uint8List responseBody) {
   // 수신 데이터를 JSON 포맷(JSON Array)으로 디코딩
   final parsed = jsonDecode(utf8.decode(responseBody)).cast<Map<String, dynamic>>();
 
   // JSON Array를 List<Photo>로 변환하여 반환
-  return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+  return parsed.map<Movie>((json) => Movie.fromJson(json)).toList();
 }
 
 class MyApp extends StatelessWidget {
@@ -118,7 +118,7 @@ class _MyWidgetState extends State<MyWidget> {
             leading: Icon(Icons.movie),
             title: const Text('영화 예매하기'),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp1()));
+             
             },
           ),
           ListTile(
@@ -129,11 +129,13 @@ class _MyWidgetState extends State<MyWidget> {
           ListTile(
             leading: Icon(Icons.leaderboard),
             title: const Text('영화 랭킹'),
-            onTap: () {},
+            onTap: () {
+               Navigator.push(context, MaterialPageRoute(builder: (_) => Rank()));
+            },
           )
         ],
       )),
-      body: FutureBuilder<List<Photo>>(
+      body: FutureBuilder<List<Movie>>(
         // future 항목에 fetchPhotos 함수 설정. fetchPhotos는 Future 객체를 결과값으로 반환
         future: fetchPhotos(http.Client()),
         // Future 객체를 처리할 빌더
@@ -142,7 +144,7 @@ class _MyWidgetState extends State<MyWidget> {
           if (snapshot.hasError) print(snapshot.error);
           // 정상적으로 데이터가 수신된 경우
           return snapshot.hasData
-              ? PhotosList(photos: snapshot.data) // PhotosList를 출력
+              ? MovieList(movies: snapshot.data) // PhotosList를 출력
               : Center(
                   child: CircularProgressIndicator()); // 데이터 수신 전이면 인디케이터 출력
         },
@@ -152,10 +154,10 @@ class _MyWidgetState extends State<MyWidget> {
 }
 
 
-class PhotosList extends StatelessWidget {
-  final List<Photo>? photos;
+class MovieList extends StatelessWidget {
+  final List<Movie>? movies;
 
-  PhotosList({Key? key, this.photos }) : super(key: key);
+  MovieList({Key? key, this.movies }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -163,18 +165,18 @@ class PhotosList extends StatelessWidget {
     return GridView.builder(
       gridDelegate:
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-      itemCount: photos?.length,
+      itemCount: movies?.length,
       itemBuilder: (context, index) {
-        var photo = photos?[index];
+        var movie = movies?[index];
         // 컨테이너를 생성하여 반환
         return Container(
           child: Column(
             children: <Widget>[
               // 이미지의 albumId와 ID 값을 출력
-              Text("${photo?.movie_name}"),
-              Text("${photo?.movie_time}"),
+              Text("${movie?.movie_name}"),
+              Text("${movie?.movie_time}"),
               // thumbnailUrl에 해당하는 이미지를 온라인으로부터 다운로드하여 출력
-              Image.network(photo?.thumbnailUrl ?? "null")
+              Image.network(movie?.thumbnailUrl ?? "null")
             ],
           ),
         );

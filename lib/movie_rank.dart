@@ -9,48 +9,48 @@ import 'package:http/http.dart' as http;
 import 'package:movie_project_app/config.dart';
 
 void main() {
-  runApp(MyApp1());
+  runApp(Rank());
 }
 
-class Photo {
-  final String? grade;
+class Movie {
+  final String? rank;
   final String? movie_name;
-  final String? movie_time;
-  final String? thumbnailUrl ;
+  final String? variable ;
+  final String? variable_img;
 
-  Photo({this.grade, this.movie_name, this.movie_time, this.thumbnailUrl});
+  Movie({this.rank, this.movie_name, this.variable, this.variable_img});
 
   // 사진의 정보를 포함하는 인스턴스를 생성하여 반환하는 factory 생성자
-  factory Photo.fromJson(Map<String, dynamic> json) {
-    return Photo(
-      grade: json['grade'] as String,
+  factory Movie.fromJson(Map<String, dynamic> json) {
+    return Movie(
+      rank: json['rank'] as String,
       movie_name: json['movie_name'] as String,
-      movie_time: json['movie_time'] as String,
-      thumbnailUrl: json['img_url'] as String,
+      variable: json['variable'] as String,
+      variable_img: json['variable_img'] as String
     );
   }
 }
 
-Future<List<Photo>> fetchPhotos(http.Client client) async {
+Future<List<Movie>> fetchPhotos(http.Client client) async {
   // 해당 URL로 데이터를 요청하고 수신함
   Config con = new Config();
   final response =
-      await client.get(Uri.parse(con.file1));
+      await client.get(Uri.parse(con.rank));
 
   // parsePhotos 함수를 백그라운도 격리 처리
   return compute(parsePhotos, response.bodyBytes);
 }
 
-List<Photo> parsePhotos(Uint8List responseBody) {
+List<Movie> parsePhotos(Uint8List responseBody) {
   // 수신 데이터를 JSON 포맷(JSON Array)으로 디코딩
   final parsed = jsonDecode(utf8.decode(responseBody)).cast<Map<String, dynamic>>();
 
   // JSON Array를 List<Photo>로 변환하여 반환
-  return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+  return parsed.map<Movie>((json) => Movie.fromJson(json)).toList();
 }
 
-class MyApp1 extends StatelessWidget {
-  const MyApp1({Key? key}) : super(key: key);
+class Rank extends StatelessWidget {
+  const Rank({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class _MyWidgetState extends State<MyWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('영끌'),
+        title: Text('영화 순위'),
         centerTitle: true,
         elevation: 0.0,
         backgroundColor: Colors.cyan,
@@ -97,9 +97,19 @@ class _MyWidgetState extends State<MyWidget> {
       ),
       drawer: Drawer(
           child: ListView(
-            padding: EdgeInsets.zero,
+            // padding: EdgeInsets.zero,
             children: <Widget>[
             new Container(
+              child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10.0, 12.5, 0.0, 0.0),
+                  child: Text(
+                    "영끌",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15
+                    ),
+                  ),
+              ),
               height: 50.0,
               color: Colors.cyan,
               ),
@@ -107,6 +117,7 @@ class _MyWidgetState extends State<MyWidget> {
             leading: Icon(Icons.movie),
             title: const Text('영화 예매하기'),
             onTap: () {
+             
             },
           ),
           ListTile(
@@ -117,11 +128,13 @@ class _MyWidgetState extends State<MyWidget> {
           ListTile(
             leading: Icon(Icons.leaderboard),
             title: const Text('영화 랭킹'),
-            onTap: () {},
+            onTap: () {
+               Navigator.push(context, MaterialPageRoute(builder: (_) => Rank()));
+            },
           )
         ],
       )),
-      body: FutureBuilder<List<Photo>>(
+      body: FutureBuilder<List<Movie>>(
         // future 항목에 fetchPhotos 함수 설정. fetchPhotos는 Future 객체를 결과값으로 반환
         future: fetchPhotos(http.Client()),
         // Future 객체를 처리할 빌더
@@ -130,7 +143,7 @@ class _MyWidgetState extends State<MyWidget> {
           if (snapshot.hasError) print(snapshot.error);
           // 정상적으로 데이터가 수신된 경우
           return snapshot.hasData
-              ? PhotosList(photos: snapshot.data) // PhotosList를 출력
+              ? MovieList(movies: snapshot.data) // PhotosList를 출력
               : Center(
                   child: CircularProgressIndicator()); // 데이터 수신 전이면 인디케이터 출력
         },
@@ -140,33 +153,37 @@ class _MyWidgetState extends State<MyWidget> {
 }
 
 
-class PhotosList extends StatelessWidget {
-  final List<Photo>? photos;
+class MovieList extends StatelessWidget {
+  final List<Movie>? movies;
 
-  PhotosList({Key? key, this.photos }) : super(key: key);
+  MovieList({Key? key, this.movies }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     // 그리드뷰를 builder를 통해 생성. builder를 이용하면 화면이 스크롤 될 때 해당 앨리먼트가 랜더링 됨
-    return GridView.builder(
-      gridDelegate:
-          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-      itemCount: photos?.length,
+    return ListView.separated(
+      padding: EdgeInsets.all(10),
+      itemCount: movies?.length ?? 0,
       itemBuilder: (context, index) {
-        var photo = photos?[index];
+        var movie = movies?[index];
         // 컨테이너를 생성하여 반환
         return Container(
-          child: Column(
+          child: Row(
             children: <Widget>[
-              // 이미지의 albumId와 ID 값을 출력
-              Text("${photo?.movie_name}"),
-              Text("${photo?.movie_time}"),
-              // thumbnailUrl에 해당하는 이미지를 온라인으로부터 다운로드하여 출력
-              Image.network(photo?.thumbnailUrl ?? "null")
+              Text("${movie?.rank}"),
+              Spacer(),
+              Text("${movie?.movie_name}"),
+              Spacer(),
+              Image.network(movie?.variable_img ?? "null"),
+              Text("${movie?.variable}"),
             ],
           ),
         );
       },
+      separatorBuilder: (BuildContext context,int index) => const Divider(
+            height: 20.0,
+            color: Colors.grey,
+          ),
     );
   }
 }
