@@ -7,28 +7,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movie_project_app/config.dart';
-import 'package:movie_project_app/moive_tobe.dart';
+import 'package:movie_project_app/movie_rank.dart';
 import 'package:movie_project_app/main.dart';
-
 void main() {
-  runApp(Rank());
+  runApp(Tobe());
 }
 
 class Movie {
-  final String? rank;
+  final String? img_url;
   final String? movie_name;
-  final String? variable ;
-  final String? variable_img;
+  final String? open_date ;
 
-  Movie({this.rank, this.movie_name, this.variable, this.variable_img});
+  Movie({this.img_url, this.movie_name, this.open_date});
 
   // 사진의 정보를 포함하는 인스턴스를 생성하여 반환하는 factory 생성자
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
-      rank: json['rank'] as String,
+      img_url: json['img_url'] as String,
       movie_name: json['movie_name'] as String,
-      variable: json['variable'] as String,
-      variable_img: json['variable_img'] as String
+      open_date: json['open_date'] as String,
     );
   }
 }
@@ -37,7 +34,7 @@ Future<List<Movie>> fetchPhotos(http.Client client) async {
   // 해당 URL로 데이터를 요청하고 수신함
   Config con = new Config();
   final response =
-      await client.get(Uri.parse(con.rank));
+      await client.get(Uri.parse(con.tobe));
 
   // parsePhotos 함수를 백그라운도 격리 처리
   return compute(parsePhotos, response.bodyBytes);
@@ -51,8 +48,8 @@ List<Movie> parsePhotos(Uint8List responseBody) {
   return parsed.map<Movie>((json) => Movie.fromJson(json)).toList();
 }
 
-class Rank extends StatelessWidget {
-  const Rank({Key? key}) : super(key: key);
+class Tobe extends StatelessWidget {
+  const Tobe({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +73,7 @@ class _MyWidgetState extends State<MyWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('영화 순위'),
+        title: Text('상영 예정작'),
         centerTitle: true,
         elevation: 0.0,
         backgroundColor: Colors.cyan,
@@ -119,14 +116,14 @@ class _MyWidgetState extends State<MyWidget> {
             leading: Icon(Icons.movie),
             title: const Text('영화 예매하기'),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp()));
+               Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp()));
             },
           ),
           ListTile(
             leading: Icon(Icons.access_time),
             title: const Text('상영 예정작'),
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => Tobe()));
+               Navigator.push(context, MaterialPageRoute(builder: (_) => Tobe()));
             },
           ),
           ListTile(
@@ -173,13 +170,14 @@ class MovieList extends StatelessWidget {
         // 컨테이너를 생성하여 반환
         return Container(
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Text("${movie?.rank}"),
-              Spacer(),
+              Image.network(movie?.img_url ?? "null"),
+              // Spacer(),
               Text("${movie?.movie_name}"),
-              Spacer(),
-              Image.network(movie?.variable_img ?? "null"),
-              Text("${movie?.variable}"),
+              // Spacer(),
+              Text("${movie?.open_date}"),
+              // Spacer()
             ],
           ),
         );

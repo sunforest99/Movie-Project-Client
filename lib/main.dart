@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:movie_project_app/config.dart';
 import 'package:movie_project_app/movie_rank.dart';
+import 'package:movie_project_app/moive_tobe.dart';
 
 void main() {
   runApp(MyApp());
@@ -118,13 +119,15 @@ class _MyWidgetState extends State<MyWidget> {
             leading: Icon(Icons.movie),
             title: const Text('영화 예매하기'),
             onTap: () {
-             
+               Navigator.push(context, MaterialPageRoute(builder: (_) => MyApp()));
             },
           ),
           ListTile(
             leading: Icon(Icons.access_time),
             title: const Text('상영 예정작'),
-            onTap: () {},
+            onTap: () {
+               Navigator.push(context, MaterialPageRoute(builder: (_) => Tobe()));
+            },
           ),
           ListTile(
             leading: Icon(Icons.leaderboard),
