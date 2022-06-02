@@ -15,16 +15,18 @@ void main() {
 }
 
 class Movie {
+  final String? count_img;
   final String? rank;
   final String? movie_name;
   final String? variable ;
   final String? variable_img;
 
-  Movie({this.rank, this.movie_name, this.variable, this.variable_img});
+  Movie({this.count_img, this.rank, this.movie_name, this.variable, this.variable_img});
 
   // 사진의 정보를 포함하는 인스턴스를 생성하여 반환하는 factory 생성자
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
+      count_img : json['count_img'] as String,
       rank: json['rank'] as String,
       movie_name: json['movie_name'] as String,
       variable: json['variable'] as String,
@@ -174,7 +176,7 @@ class MovieList extends StatelessWidget {
         return Container(
           child: Row(
             children: <Widget>[
-              Text("${movie?.rank}"),
+              Image.network(movie?.count_img ?? "null"),
               Spacer(),
               Text("${movie?.movie_name}"),
               Spacer(),
